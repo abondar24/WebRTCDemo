@@ -1,0 +1,18 @@
+{
+  "name": "usermedia",
+  "version": "1.0.0",
+  "description": "getting user media using web-rtc",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/abondar24/WebRTCDemo.git"
+  },
+  "author": "abondar",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "node-static": "^0.7.10"
+  }
+}
