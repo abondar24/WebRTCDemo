@@ -1,0 +1,27 @@
+{
+  "name": "photobooth",
+  "version": "1.0.0",
+  "description": "Multi screen WebRTC app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abondar24/WebRTCDemo.git"
+  },
+  "keywords": [
+    "webrtc",
+    "node"
+  ],
+  "author": "abondar",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/abondar24/WebRTCDemo/issues"
+  },
+  "homepage": "https://github.com/abondar24/WebRTCDemo#readme",
+  "dependencies": {
+    "canvas-api": "^3.6.0",
+    "node-static": "^0.7.10"
+  }
+}
