@@ -14,3 +14,4 @@ static
 
 1. UserMedia - simple app that captures sound and video from device
 2. PhotoBooth - small app capturing shots from video stream
+3. Bacis - WebRTC app doing local connection
