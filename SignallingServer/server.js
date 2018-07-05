@@ -67,7 +67,7 @@ wss.on('connection',function(connection){
            connection.otherName = data.name;
            sendTo(conn,{
              type: "candidate",
-             answer: data.candidate
+             candidate: data.candidate
            });
          }
          break;

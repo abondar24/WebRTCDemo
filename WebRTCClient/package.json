@@ -1,0 +1,27 @@
+{
+  "name": "webrtcclient",
+  "version": "1.0.0",
+  "description": "WebRTC client app for calling",
+  "main": "client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abondar24/WebRTCDemo.git"
+  },
+  "keywords": [
+    "webrtc",
+    "node",
+    "js"
+  ],
+  "author": "abondar",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/abondar24/WebRTCDemo/issues"
+  },
+  "homepage": "https://github.com/abondar24/WebRTCDemo#readme",
+  "dependencies": {
+    "static": "^2.0.0"
+  }
+}

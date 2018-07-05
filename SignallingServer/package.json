@@ -2,7 +2,7 @@
   "name": "signallingserver",
   "version": "1.0.0",
   "description": "Signalling Server for WebRTC",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
