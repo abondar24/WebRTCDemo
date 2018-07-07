@@ -8,11 +8,14 @@ var loginPage = document.querySelector('#login-page'),
     remoteUsernameInput = document.querySelector('#remote-username')
     callButton = document.querySelector('#call'),
     callPage = document.querySelector('#call-page')
-    hangUpButton = document.querySelector('#hang-up');
+    hangUpButton = document.querySelector('#hang-up'),
+    sendButton = document.querySelector('#send'),
+    received = document.querySelector('#received'),
+    messageInput = document.querySelector('#message');
 
 var localVideo = document.querySelector('#local'),
     remoteVideo = document.querySelector('#remote'),
-    localConnection,stream;
+    localConnection,stream,sendChannel,receiveChannel;
 
 var offerOptions = {
           offerToReceiveAudio: 1,
@@ -155,6 +158,7 @@ function startConnection(){
         localVideo.srcObject = stream;
         setupPeerConnection(stream);
      }).catch(function(error){
+       console.log(error);
        alert("Camera capture failed!")
      });
 };
@@ -164,7 +168,8 @@ function setupPeerConnection(stream){
     "iceServers": [{ "urls": ["stun:stun.1.google.com:19302"]}]
   };
 
-  localConnection = new RTCPeerConnection(configuration);
+  localConnection = new RTCPeerConnection(configuration, {optional: [{RtpDataChannels: true}]});
+
 
   localConnection.ontrack = function(e){
     remoteVideo.srcObject = e.streams[0];
@@ -185,6 +190,19 @@ function setupPeerConnection(stream){
     });
   }
  };
+
+ localConnection.ondatachannel = handleChannelCallback;
+
+ var sendChannelOptions = {
+     reliable: true
+ }
+  sendChannel = localConnection.createDataChannel("dl",sendChannelOptions);
+  localConnection.ondatachannel = handleChannelCallback;
+  sendChannel.onopen = handleDataChannelOpen;
+  sendChannel.onmessage = handleDataChannelMessageReceived;
+  sendChannel.onerror = handleDataChannelError;
+  sendChannel.onclose = handleDataChannelClose;
+
 };
 
 function startPeerConnection(user){
@@ -197,5 +215,45 @@ function startPeerConnection(user){
     });
     localConnection.setLocalDescription(offer);
   }).catch(function(error){
-      console.log(error);});;
+      console.log(error);}
+    );
 }
+
+  function handleDataChannelOpen (event) {
+  console.log("Channel opened");
+  sendChannel.send("Hiiiii");
+  };
+
+  function handleDataChannelMessageReceived (event) {
+    var data = event.data;
+    console.log("Got some data:" +data);
+
+    received.innerHTML +=  data + "<br />";
+    received.scrollTop = received.scrollHeight;
+
+  };
+
+   function handleDataChannelError (error) {
+    console.log(error);
+  };
+
+   function handleDataChannelClose (event) {
+    console.log("Channel closed");
+  };
+
+  function handleChannelCallback(event) {
+     receiveChannel = event.channel;
+
+     receiveChannel.onopen = handleDataChannelOpen;
+     receiveChannel.onmessage = handleDataChannelMessageReceived;
+     receiveChannel.onerror = handleDataChannelError;
+     receiveChannel.onclose = handleDataChannelClose;
+
+  };
+
+  sendButton.addEventListener("click", function (event) {
+    var val = messageInput.value;
+    received.innerHTML += val + "<br />";
+    received.scrollTop = received.scrollHeight;
+    receiveChannel.send(val);
+  });

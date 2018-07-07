@@ -49,7 +49,7 @@ For testing the server
 
 All tests execept login require second client session and login on both sessions
 
-5. WebRTCClient - Client app for making calls
+5. WebRTCClient - Client app for making calls,sending messages.
 
 ### Run
 ```yaml
@@ -61,5 +61,5 @@ in browser: localhost:8080/client.html
 
 Running signalling server required.
 For testing:
-
 Open client in two browser tabs ,login and make a call.
+Chat feature works only while calling
