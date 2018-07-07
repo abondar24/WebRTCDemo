@@ -4,7 +4,7 @@ Some WebRTC examples
 ## Demos
 
 1. UserMedia - simple app that captures sound and video from device
-### Run
+
 ```yaml
 
 npm install
@@ -14,7 +14,7 @@ in browser: localhost:8080/media.html
 ```
 
 2. PhotoBooth - small app capturing shots from video stream
-### Run
+
 ```yaml
 
 npm install
@@ -24,7 +24,7 @@ in browser: localhost:8080/photo.html
 ```
 
 3. Bacis - WebRTC app doing local connection
-### Run
+
 ```yaml
 
 npm install
@@ -34,7 +34,7 @@ in browser: localhost:8080/basics.html
 ```
 
 4. Signalling Server - Signalling Server for WebRTC
-### Run
+
 ```yaml
 
 npm install
@@ -49,9 +49,8 @@ For testing the server
 
 All tests execept login require second client session and login on both sessions
 
-5. WebRTCClient - Client app for making calls,sending messages.
+5. WebRTCClient - Client app for making calls,sending messages and files.
 
-### Run
 ```yaml
 
 npm install
@@ -62,4 +61,4 @@ in browser: localhost:8080/client.html
 Running signalling server required.
 For testing:
 Open client in two browser tabs ,login and make a call.
-Chat feature works only while calling
+Chat and file sending features work only while calling

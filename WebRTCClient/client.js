@@ -11,7 +11,9 @@ var loginPage = document.querySelector('#login-page'),
     hangUpButton = document.querySelector('#hang-up'),
     sendButton = document.querySelector('#send'),
     received = document.querySelector('#received'),
-    messageInput = document.querySelector('#message');
+    messageInput = document.querySelector('#message'),
+    fileButton = document.querySelector('#sendFile'),
+    statusText = document.querySelector('#status');
 
 var localVideo = document.querySelector('#local'),
     remoteVideo = document.querySelector('#remote'),
@@ -21,6 +23,9 @@ var offerOptions = {
           offerToReceiveAudio: 1,
           offerToReceiveVideo: 1
         };
+
+var currFile = [],
+    currFileMeta;
 
 callPage.style.display = "none";
 
@@ -194,15 +199,16 @@ function setupPeerConnection(stream){
  localConnection.ondatachannel = handleChannelCallback;
 
  var sendChannelOptions = {
-     reliable: true
- }
+   ordered: true,
+   reliable: true
+     }
+
   sendChannel = localConnection.createDataChannel("dl",sendChannelOptions);
   localConnection.ondatachannel = handleChannelCallback;
   sendChannel.onopen = handleDataChannelOpen;
   sendChannel.onmessage = handleDataChannelMessageReceived;
   sendChannel.onerror = handleDataChannelError;
   sendChannel.onclose = handleDataChannelClose;
-
 };
 
 function startPeerConnection(user){
@@ -226,11 +232,34 @@ function startPeerConnection(user){
 
   function handleDataChannelMessageReceived (event) {
     var data = event.data;
-    console.log("Got some data:" +data);
+    if (isBase64(data) || isJson(data)){
 
-    received.innerHTML +=  data + "<br />";
-    received.scrollTop = received.scrollHeight;
+        if (isJson(data)){
+          var msg = JSON.parse(data);
 
+          switch (msg.type){
+            case "start":
+                currFile = [];
+                currFileMeta = msg.data;
+                console.log("Receiving file :",currFileMeta);
+                break;
+
+            case "end":
+                saveFile(currFileMeta,currFile);
+                break;
+          }
+        } else {
+            currFile.push(atob(data));
+          }
+
+
+    } else {
+
+      console.log("Got a new message:" +data);
+
+      received.innerHTML +=  data + "<br />";
+      received.scrollTop = received.scrollHeight;
+    }
   };
 
    function handleDataChannelError (error) {
@@ -243,12 +272,10 @@ function startPeerConnection(user){
 
   function handleChannelCallback(event) {
      receiveChannel = event.channel;
-
      receiveChannel.onopen = handleDataChannelOpen;
      receiveChannel.onmessage = handleDataChannelMessageReceived;
      receiveChannel.onerror = handleDataChannelError;
      receiveChannel.onclose = handleDataChannelClose;
-
   };
 
   sendButton.addEventListener("click", function (event) {
@@ -257,3 +284,117 @@ function startPeerConnection(user){
     received.scrollTop = received.scrollHeight;
     receiveChannel.send(val);
   });
+
+  fileButton.addEventListener("click", function (event) {
+     var files = document.querySelector('#files').files;
+
+     if (files.length>0){
+       sendChannel.send(JSON.stringify({
+         type: "start",
+         data: files[0]
+       }));
+     }
+
+     sendFile(files[0])
+  });
+
+  function encodeArrayBuffer(buffer){
+    var binary = '';
+    var bytes = new Uint8Array(buffer);
+    var len = bytes.byteLength;
+    for (var i=0;i<len;i++){
+      binary += String.fromCharCode( bytes[i]);
+    }
+
+    return btoa(binary);
+  }
+
+  function base64ToBlob(binData,contentType){
+     contentType = contentType || '';
+
+     var byteArrays = [], byteNums, slice;
+     for (var i;i<binData.lenth;i++){
+       slice = binData[i];
+       byteNums = new Array(slice.length);
+
+       for (var n=0;n<slice.length;n++){
+         byteNums[n] = slice.charCodeAt(n);
+       }
+
+       var byteArray = new Uint8Array(byteNums);
+       byteArrays.push(byteArray);
+     }
+
+     var blob = new Blob(byteArrays,{type: contentType});
+  }
+
+  var MAX_CHUNK = 16000;
+  function sendFile(file){
+    var fileReader = new FileReader();
+
+    fileReader.onloadend = function(event){
+      if (event.target.readyState = FileReader.DONE){
+        var buffer = fileReader.result,
+            start = 0,
+            end = 0,
+            last = false;
+
+        function sendChunk(){
+          end = start + MAX_CHUNK;
+          if (end > file.size){
+            end = file.size;
+            last = true;
+          }
+
+          var percentage = Math.floor((end / file.size) * 100);
+          statusText.innerHTML = "Sending... " + percentage + "%"
+
+
+          sendChannel.send(encodeArrayBuffer(buffer.slice(start,end)));
+
+          if (last===true){
+            sendChannel.send(JSON.stringify({
+              type: "end"
+            }));
+          } else {
+            start = end;
+            setTimeout(function(){
+              sendChunk();
+            },100);
+          }
+        }
+
+        sendChunk();
+      }
+    };
+
+    fileReader.readAsArrayBuffer(file);
+  }
+
+  function saveFile(meta,data){
+     window.URL = window.URL || window.webkitURL;
+     var blob = base64ToBlob(data,meta.type);
+
+     var link = document.createElement('a');
+
+     link.href = window.URL.createObjectURL(blob);
+     link.download = meta.name;
+     link.click();
+  }
+
+  function isBase64(str) {
+    try {
+        return btoa(atob(str)) == str;
+    } catch (err) {
+        return false;
+    }
+}
+
+function isJson(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}

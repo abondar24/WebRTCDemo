@@ -9,6 +9,13 @@ video {
    background: black;
    border: 1px solid gray;
 }
+
+.thumb {
+  height: 75px;
+  border: 1px solid #000;
+  margin: 10px 5px 0 0;
+}
+
 .page {
    position: relative;
    display: block;
@@ -38,4 +45,18 @@ video {
   margin-top: 10px;
   color: black;
   overflow: scroll;
+}
+
+
+#byte_content {
+  margin: 5px;
+  max-height: 100px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+}
+
+
+#byte_range {
+margin-top: 5px;
 }
